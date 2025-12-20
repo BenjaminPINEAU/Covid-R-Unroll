@@ -11,7 +11,7 @@ perf_psnr = PSNR()
 import torch.nn as nn
 import time
 
-from utils.fonction_dual_primal import prox_DKL, proxL1_norm, proxL1_norm_adj
+from utils.function_dual_primal import prox_DKL, proxL1_norm, proxL1_norm_adj
 from utils.oplin import create_D2, op_lin, op_lin_mat, op_lin_adj, op_lin_adj_mat, op_lin_conv, op_lin_adj_conv
 
 

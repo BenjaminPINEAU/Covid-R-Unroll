@@ -11,7 +11,7 @@ perf_psnr = PSNR()
 import torch.nn as nn
 from torchviz import make_dot
 
-from utils.fonction_dual_primal import prox_DKL, proxL1_norm
+from utils.function_dual_primal import prox_DKL, proxL1_norm
 from utils.oplin import discrete_derivation, discrete_derivation_adj
 
 

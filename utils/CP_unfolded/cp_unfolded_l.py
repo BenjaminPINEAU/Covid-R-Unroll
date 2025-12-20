@@ -12,8 +12,7 @@ import torch.nn as nn
 from torchviz import make_dot
 import math
 
-from utils.fonction_dual_primal import prox_DKL, proxL1_norm
-from utils.metric import loss_L1, loss_L2
+from utils.function_dual_primal import prox_DKL, proxL1_norm
 from utils.oplin import discrete_derivation, discrete_derivation_adj
 
 

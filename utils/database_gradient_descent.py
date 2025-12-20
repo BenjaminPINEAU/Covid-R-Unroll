@@ -18,8 +18,7 @@ import os
 
 from utils.CP_unfolded import cp_unfolded_l as cp_l, cp_unfolded_LSTexp as cp_lstexp, cp_unfolded_Lexp as cp_lexp, cp_unfolded_OpLin as cp_oplin
 from utils.oplin import discrete_derivation
-from utils.metric import metric
-from utils.fonction_dual_primal import CP_optim_fix
+from utils.function_dual_primal import CP_optim_fix
 from utils.create_database import CustomDataset
 
 
