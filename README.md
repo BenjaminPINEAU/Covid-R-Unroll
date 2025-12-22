@@ -1,6 +1,6 @@
 # Unfolded Proximal Algorithm for Estimating the COVID-19 Reproduction Number
 
-This project contains the Python code done during an internship at LS2N (April to August 2025) as part of my studies at Centrale Nantes. The internship was supervised by Barbara Pascal and Sébastien Bourguignon. .
+This project contains the Python code done during an internship at LS2N (April to August 2025) as part of my studies at Centrale Nantes. The internship was supervised by Barbara Pascal and Sébastien Bourguignon and funded by the CNRS.
 This internship led to the writing of a detailed scientific report, *in French*, whose [PDF](https://github.com/BenjaminPINEAU/unrolling-internship/blob/main/docs/rapport_BenjaminPINEAU.pdf) version is available in this repository for completeness.
 
 
