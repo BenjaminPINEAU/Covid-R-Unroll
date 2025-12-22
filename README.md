@@ -1,16 +1,17 @@
-# Unfolded Proximal Algorithms for Estimating the COVID-19 Reproduction Number
+# Unfolded Proximal Algorithm for Estimating the COVID-19 Reproduction Number
 
-This project contains the Python code associated to the report [[rapport_BenjaminPINEAU]](rapport_BenjaminPINEAU.pdf) done during an internship.
+This project contains the Python code done during an internship at LS2N (April to August 2025) as part of my studies at Centrale Nantes. The internship was supervised by Barbara Pascal and Sébastien Bourguignon. .
+This internship led to the writing of a detailed scientific report, *in French*, whose [PDF](https://github.com/BenjaminPINEAU/unrolling-internship/blob/main/docs/rapport_BenjaminPINEAU.pdf) version is available in this repository for completeness.
 
 
 ## Project description
 
 This project focuses on the **unfolding of the Chambolle–Pock algorithm** to estimate the COVID-19 reproduction number. Several network architectures are available and a toy data set is provided to test the training of the unrolled Chambolle-Pock algorithm. For this purpose, 2 notebooks are also provided : 
 
-- [`train_demo`](train_demo.ipynb)
+- [`demo_unroll_train`](demo_unroll_train.ipynb)
 > Illustrates the general operation of training a network. We also detail the various architectures available.
 
-- [`display_data`](display_data.ipynb)
+- [`demo_R_estim`](demo_R_estim.ipynb)
 > Plot the estimators obtained after training the network and comparison with the desired ground truth.
 
 ---
@@ -20,8 +21,8 @@ This project focuses on the **unfolding of the Chambolle–Pock algorithm** to e
 The repository is organized as follows:
 
 ```text
-├── train_demo                      # Training scripts and demo experiments
-├── display_data                    # Visualization and plotting utilities
+├── demo_unroll_train               # Training scripts and demo experiments
+├── demo_R_estim                    # Visualization and plotting utilities
 └── utils                           
     ├── CP_unfolded
     │   ├── CP_unfolded_Lexp        # Custom neural network
