@@ -1,12 +1,5 @@
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 import torch
-import matplotlib.dates as mdates
-from datetime import datetime
-import torch.optim as optim
-
-from utils.oplin import create_D2, discrete_derivation, discrete_derivation_adj
+from oplin import discrete_derivation, discrete_derivation_adj
 
 ### Functions needed for Primal-dual minimization ###
 

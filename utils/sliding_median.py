@@ -1,38 +1,34 @@
 import numpy as np
 import torch
 
-"""
-The following two functions are extracted from 
-github.com/juliana-du/Covid-R-estim/blob/main/include/sliding_median.py
-"""
 
 def mad_numpy(arr):
     """ Median Absolute Deviation: a "Robust" version of standard deviation.
         Indices variabililty of the sample.
     """
     med = np.median(arr)
-    return np.median(np.abs(arr - med))  # python version
+    return np.median(np.abs(arr - med))
 
 
-def sliding_median_numpy(data, alpha = 0.1, nbDaysMed = 15):
+def sliding_median_numpy(data, alpha = 0.1, nbDaysMed = 14):
     """
     Computes smoothened data with a sliding median using previous function mad.
     For exemple if alpha = 0, for each t, Z^{denoised}_t = MAD(Z_{t-width,..., t+width}).
     NON-CAUSAL VERSION.
-    :param data: ndarray of shape (days,) in MATLAB format
-    :param alpha: threshold for denoising. Explicitly alpha =max(|data_t - median(Z_{[t-w, t+w]})|) with w = nbDaysMed/2
-    :param nbDaysMed: number of days on which this function is applied
-    :return: data, data
+    -param data: ndarray of shape (days,) in MATLAB format
+    -param alpha: threshold for denoising. Explicitly alpha =max(|data_t - median(Z_{[t-w, t+w]})|) with w = nbDaysMed/2
+    -param nbDaysMed: number of days on which this function is applied
+    -return: data, data
     """
 
     totalDays = len(data)
-    width = int((nbDaysMed - 1) / 2)  # if nbDaysMed is odd
+    width = int((nbDaysMed - 1) / 2)
     dataMed = np.zeros(np.shape(data))
 
     dataMedians = np.zeros(np.shape(data))
     dataMADs = np.zeros(np.shape(data))
     for k in range(0, totalDays):
-        dataWindowed = data[max(k - width, 0): min(k + width + 1, totalDays)]  # 0 index for 1D version only
+        dataWindowed = data[max(k - width, 0): min(k + width + 1, totalDays)]
         dataWindowedMedian = np.median(dataWindowed)
         dataWindowedMAD = mad_numpy(dataWindowed)
 
@@ -48,7 +44,7 @@ def sliding_median_numpy(data, alpha = 0.1, nbDaysMed = 15):
 
 
 """
-adaptation of previous functions for PyTorch
+adaptation of the previous functions for PyTorch
 """
 
 def mad(x):
@@ -56,7 +52,7 @@ def mad(x):
     median = x.median()
     return (x - median).abs().median()
 
-def sliding_median(data, alpha=0.1, nbDaysMed=15):
+def sliding_median(data, alpha=0.1, nbDaysMed=14):
     """
     sliding_median function for Pytorch tensor
     """

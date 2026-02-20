@@ -1,10 +1,7 @@
 import os
 import torch
-import pandas as pd 
 from torch.utils.data import Dataset
-from scipy.io import loadmat
-import numpy as np
-from utils.sliding_median import sliding_median
+import pickle
 
 
 class CustomDataset(Dataset):
@@ -17,54 +14,71 @@ class CustomDataset(Dataset):
         - In each file: daily count Z, associated global infectiousness PhiZ, list of regularisation parameters,
             list of reproduction numbers R obtained with Chambolle-Pock algorithm 
             and the list of regularisation parameters
-    We iterate for each country (ie each file) in the folder, and we extract Z, PhiZ and R
+    We iterate for each file in the folder, and we extract Z, PhiZ and R
     """
     
-    def __init__(self, data_dir, transform = None, device = 'cpu', norm_type = 'max'):
+    def _pre_process(self, Z, PhiZ, R_lmb):
+        Z = torch.tensor(Z, dtype=torch.float, device=self.device).unsqueeze(0)
+        PhiZ = torch.tensor(PhiZ, dtype=torch.float, device=self.device).unsqueeze(0)
+        R_lmb = torch.tensor(R_lmb, dtype=torch.float, device=self.device).unsqueeze(0)
+
+        if self.norm_type == 'max':
+            Z_norm = Z/torch.max(Z)
+            PhiZ_norm = PhiZ/torch.max(Z)
+
+        elif self.norm_type == 'std':
+            std_Z = Z.std(dim=None, keepdim=True, unbiased=False)
+            Z_norm = Z/std_Z
+            PhiZ_norm = PhiZ/std_Z
+
+        return Z_norm, PhiZ_norm, R_lmb
+    
+
+    def __init__(self, dataset, transform = None, device = 'cpu', norm_type = 'std'):
+
         self.liste_Z = []
         self.liste_PhiZ = []
         self.liste_R = []
-        self.country = []
         self.transform = transform
         self.device = device
         self.norm_type = norm_type
-
-        print(norm_type)
         
-        for filename in os.listdir(data_dir):
-            filepath = os.path.join(data_dir, filename)
-            if os.path.isfile(filepath):
-                data = loadmat(filepath)
+        if isinstance(dataset, str):
+            data_dir = dataset
+            for filename in os.listdir(data_dir):
+                filepath = os.path.join(data_dir, filename)
+                if os.path.isfile(filepath):
+                    with open(filepath, 'rb') as f:
+                        data = pickle.load(f)
 
-            liste_lambda = data['liste_lambda'].squeeze()
-            index = np.where(liste_lambda == 50)[0][0]
+                Z = data["Z"]
+                PhiZ = data['ZPhi']
+                R_lmb = data['R']
 
-            Z = data["Z"]
-            PhiZ = data['ZPhi']
-            R_lmb = data['dico_RU'][f'R_{index}'].squeeze().tolist()
-            Z[Z < 0] = 0
-            Z[Z == 0] = 1
-            PhiZ[PhiZ == 0] = 1e4
+                Z_norm, PhiZ_norm, R_lmb = self._pre_process(Z, PhiZ, R_lmb)
+                self.liste_R.append(R_lmb)
+                self.liste_PhiZ.append(PhiZ_norm)
+                self.liste_Z.append(Z_norm)
+                
+        elif isinstance(dataset, dict):
+            dico_dataset = dataset
+            for c, (territory, synthetic_data) in enumerate(dico_dataset.items()):
+                N_replica = len(synthetic_data)
+                for i in range(N_replica):
 
-            Z = torch.tensor(Z, dtype=torch.float, device=self.device)
-            PhiZ = torch.tensor(PhiZ, dtype=torch.float, device=self.device)
-            R_lmb = torch.tensor(R_lmb, dtype=torch.float, device=self.device)
+                    Z = synthetic_data[i]['Z']
+                    PhiZ = synthetic_data[i]['ZPhi']
+                    R_lmb = synthetic_data[i]['R']
 
-            if self.norm_type == 'max':
-                Z_norm = Z/torch.max(Z)
-                PhiZ_norm = PhiZ/torch.max(Z)
+                    Z_norm, PhiZ_norm, R_lmb = self._pre_process(Z, PhiZ, R_lmb)
+                    self.liste_R.append(R_lmb)
+                    self.liste_PhiZ.append(PhiZ_norm)
+                    self.liste_Z.append(Z_norm)
 
-            elif self.norm_type == 'std':
-                std_Z = Z.std(dim=None, keepdim=True, unbiased=False)
-                Z_norm = Z/std_Z
-                PhiZ_norm = PhiZ/std_Z
-
-            self.liste_R.append(R_lmb)
-            self.liste_PhiZ.append(PhiZ_norm)
-            self.liste_Z.append(Z_norm)
-            self.country.append(filename)
-
-
+        else:
+            raise Exception("Unrecognised dataset format ")
+        
+        
     def __len__(self):
         return len(self.liste_R)
     
@@ -92,4 +106,4 @@ class CustomDataset(Dataset):
         if T_R > target_length:
             R = R[:, :target_length]
 
-        return R, Z_norm, PhiZ_norm#, self.country[index]
+        return R, Z_norm, PhiZ_norm

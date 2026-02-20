@@ -1,10 +1,4 @@
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 import torch
-import matplotlib.dates as mdates
-from datetime import datetime
-import torch.optim as optim
 
 
 def create_D2(T, device = 'cpu'):
@@ -63,23 +57,6 @@ def op_lin_adj(Q, A, B, device = 'cpu'):
     
     return Q_zeros*0.25
 
-def op_lin_mat(R, A, device = 'cpu'):
-    """
-    Compute the matrix product AR
-    """
-    T = R.shape[-1]
-    R_zeros = torch.zeros(R.shape, dtype=R.dtype, device = device)
-    R_zeros[:, :, :-2] = torch.einsum('ot,bst->bso', A, R)
-    return R_zeros*0.25
-
-
-def op_lin_adj_mat(Q, A):
-    """
-    Compute the matrix product AQ
-    """
-    return torch.einsum('ot,bst->bso', A, Q[:, :, :-2])*0.25
-
-
 def op_lin_conv(R, vect_op_lin):
     """
     Compute the convolution h*R while h = (c_1, ..., c_25)
@@ -93,16 +70,3 @@ def op_lin_adj_conv(Q, vect_op_lin):
     """
     y = torch.nn.functional.conv_transpose1d(Q, vect_op_lin)
     return y
-
-
-def op_lin_convS(R, vect_op_lin_start):
-    return torch.einsum('ot,bst->bso', vect_op_lin_start, R[:, :, :25])
-
-def op_lin_convE(R, vect_op_lin_end):
-    return torch.einsum('ot,bst->bso', vect_op_lin_end, R[:, :, -25:])
-
-def op_lin_adj_convS(Q_start, vect_op_lin_start):
-    return torch.einsum('ot,bst->bso', torch.transpose(vect_op_lin_start, 0, 1), Q_start)
-
-def op_lin_adj_convE(Q_end, vect_op_lin_end):
-    return torch.einsum('ot,bst->bso', torch.transpose(vect_op_lin_end, 0, 1), Q_end)

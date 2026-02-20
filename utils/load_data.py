@@ -1,6 +1,6 @@
 from scipy.io import loadmat
-import numpy as np
 import os
+import glob
 
 def load_data(country, dataset = 'dataset'):
 
@@ -19,23 +19,17 @@ def load_data(country, dataset = 'dataset'):
     - date: list of the dates in the time period
     """
     #load the file
-    filenames = [f'{dataset}/data_{country}_70weeks', f'{dataset}_validation_rapport_stage/data_{country}_70weeks', f'{dataset}/data_{country}_70weeks.mat', f'{dataset}_validation_rapport_stage/data_{country}_70weeks.mat']
-    file_exist = False
-    for fname in filenames:
-        if os.path.exists(fname):
-            data = loadmat(fname, squeeze_me=True)
-            file_exist = True
-    if not file_exist:
-        raise FileNotFoundError(f"Aucun fichier trouvé pour {country} )")
+    pattern = os.path.join(dataset, f"data_{country}*.mat")
+    files = glob.glob(pattern)
+    if not files:
+        raise FileNotFoundError(f"No file found for {country}")
+    files.sort()
+    data = loadmat(files[0], squeeze_me=True)
         
-    # extract the index of the chosen penalisation parameter
-    liste_lambda = data['liste_lambda']
-    index = np.where(liste_lambda == 50)[0][0]
-
     # extract the data
     Z = data["Z"]
     PhiZ = data['ZPhi']
-    R_lmb = data['dico_RU'][f'R_{index}'].squeeze().tolist()
+    R_lmb = data['R']
     date = data['dates']
 
     # pre-treatment
